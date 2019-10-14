@@ -3,6 +3,8 @@ services:
   nginx_lua:
     build:
       context: .
+    env_file:
+      - nginx.env
     depends_on:
       - redis_db
     ports:
