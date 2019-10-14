@@ -4,7 +4,7 @@ services:
     build:
       context: .
     depends_on:
-      redis_db
+      - redis_db
     ports:
       - 80:80
   redis_db:

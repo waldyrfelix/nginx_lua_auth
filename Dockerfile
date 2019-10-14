@@ -35,6 +35,6 @@ RUN /usr/local/openresty/luajit/bin/luarocks install lua-resty-jwt
 RUN mkdir -p /etc/nginx/lua
 
 # create and configure nginx config folder
-COPY auth.lua /etc/nginx/lua/auth.lua
-COPY nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
-COPY test.conf /etc/nginx/conf.d/test.conf 
+COPY lua/ /etc/nginx/lua/
+COPY conf/ /etc/nginx/conf.d/
+COPY conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
