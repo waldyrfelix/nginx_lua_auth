@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  nginx_lua:
+    build:
+      context: .
+    depends_on:
+      redis_db
+    ports:
+      - 80:80
+  redis_db:
+    image: redis
+    ports:
+      - 6379:6379
