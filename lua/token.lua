@@ -55,7 +55,7 @@ local function authenticate()
 end
 
 local function generate_token(user)
-    local exp_token = 60 * 60
+    local exp_token = 60
     local jwt_key = os.getenv("JWT_KEY")
 
     local jwt_token = jwt:sign(jwt_key, {
@@ -64,6 +64,7 @@ local function generate_token(user)
             sub = user.subscriber, -- subject
             iss = user.tenant, -- issuer
             aud = user.client_id, -- audience
+            dom = ngx.var.http_host, -- domain
             iat = os.time(), -- issued at
             exp = os.time() + exp_token -- expires
         }

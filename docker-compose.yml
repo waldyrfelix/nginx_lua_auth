@@ -7,9 +7,12 @@ services:
       - nginx.env
     depends_on:
       - redis_db
+      - web_api
     ports:
       - 80:80
   redis_db:
     image: redis
     ports:
       - 6379:6379
+  web_api:
+    image: nodejs-api-img
