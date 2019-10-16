@@ -1,4 +1,5 @@
 local jwt = require "resty.jwt"
+local cjson = require "cjson"
 
 local function check_token()
     -- verify if authorization header exists
@@ -18,9 +19,19 @@ local function check_token()
     local jwt_obj = jwt:verify(jwt_key, jwt_token)
 
     -- verify domain, tenant, subscriber and expiration
-    return (jwt_obj.verified == true) and
-               (jwt_obj.payload.dom == ngx.var.http_host)
+    if not jwt_obj.verified or jwt_obj.payload.dom ~= ngx.var.http_host then
+        return false
+    end
 
+    -- print(cjson.encode( jwt_obj.payload ))
+
+    ngx.var["linkapi_tenant"] = jwt_obj.payload.iss
+    ngx.var["linkapi_subscriber"] =  jwt_obj.payload.sub
+    ngx.var["linkapi_project"] =  jwt_obj.payload.pro
+    ngx.var["linkapi_dependencies"] =  jwt_obj.payload.dep
+    ngx.var["linkapi_client_id"] =  jwt_obj.payload.aud
+
+    return true
 end
 
 local token = check_token()
@@ -29,6 +40,3 @@ if not token then
     ngx.header.content_type = 'text/plain'
     ngx.say("HTTP 401 - Unauthorized")
 end
-
-ngx.var["linkapi_tenant"] = "kadjfladlfkasdlfkajsdlf"
-ngx.var["linkapi_subscriber"] = "kadjfladlfkasdlfkajsdlf"

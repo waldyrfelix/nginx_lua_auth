@@ -34,7 +34,7 @@ local function authenticate()
         return false
     end
 
-    local props, err = redis_conn:hmget(redis_key, "tenant", "subscriber")
+    local props, err = redis_conn:hmget(redis_key, "tenant", "subscriber", "project", "dependencies")
     redis_conn:close()
 
     if not props then
@@ -50,12 +50,15 @@ local function authenticate()
     return {
         client_id = obj_data.client_id,
         tenant = props[1],
-        subscriber = props[2]
+        subscriber = props[2],
+        project = props[3], 
+        dependencies = props[4]
     }
 end
 
 local function generate_token(user)
-    local exp_token = 60
+    local expires_in = 60 * 60
+    local issued_at = os.time()
     local jwt_key = os.getenv("JWT_KEY")
 
     local jwt_token = jwt:sign(jwt_key, {
@@ -65,12 +68,14 @@ local function generate_token(user)
             iss = user.tenant, -- issuer
             aud = user.client_id, -- audience
             dom = ngx.var.http_host, -- domain
-            iat = os.time(), -- issued at
-            exp = os.time() + exp_token -- expires
+            pro = user.project,
+            dep = user.dependencies,
+            iat = issued_at, -- issued at
+            exp = issued_at + expires_in -- expires
         }
     })
 
-    return {access_token = jwt_token, expires_in = exp_token}
+    return {access_token = jwt_token, expires_in = expires_in}
 end
 
 local user = authenticate()
